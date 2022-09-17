@@ -44,6 +44,7 @@ namespace grid_clock
         // 选中的按钮
         private int selected = 0;
 
+
         
 
         public Form1()
@@ -263,7 +264,7 @@ namespace grid_clock
 
         private void timeLabel_Click(object sender, EventArgs e)
         {
-            ShwoAlarmMessage(new Alarm());
+            ShowAlarmMessage(new Alarm());
         }
 
         private void Form1_DoubleClick(object sender, EventArgs e)
@@ -295,7 +296,11 @@ namespace grid_clock
 
 
             h = dateTime.Hour;
-            m = dateTime.Minute;
+            if (m != dateTime.Minute)
+            {
+                m = dateTime.Minute;
+                RingAlarm();
+            }
             s = dateTime.Second;
 
             float progress = (m * 60 + s) / 3600.0f;
@@ -328,6 +333,15 @@ namespace grid_clock
             hourButtons[h].BackgroundImage = mixed;
         }
 
+        private void RingAlarm()
+        {
+            Alarm alarm = Alarm.GetAlarm(h, m);
+            if (alarm != null)
+            {
+                ShowAlarmMessage(alarm);
+            }
+        }
+
         private void noteTextBox_TextChanged(object sender, EventArgs e)
         {
             if (saveNote)
@@ -337,12 +351,18 @@ namespace grid_clock
                 DrawAlarmImg(selected);
             }
         }
-        private void ShwoAlarmMessage(Alarm alarm)
+        private void ShowAlarmMessage(Alarm alarm)
         {
-            string s = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+            // 窗口前置
+            if (this.WindowState==FormWindowState.Minimized)this.WindowState = FormWindowState.Normal; 
+            this.Activate();
+
+            // 播放声音
             System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"alarm.wav");
             player.Play();
-            MessageBox.Show($"{alarm.description}","闹钟");
+
+            // 弹窗
+            MessageBox.Show($"{alarm.description}", "闹钟", MessageBoxButtons.OK, MessageBoxIcon.None);
         }
     }
 }

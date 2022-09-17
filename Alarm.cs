@@ -46,6 +46,18 @@ namespace grid_clock
             }
         }
 
+        public static Alarm GetAlarm(int h,int m)
+        {
+            foreach(Alarm alarm in AlarmList[h])
+            {
+                if (alarm.minute == m)
+                {
+                    return alarm;
+                }
+            }
+            return null;
+        }
+
 
     }
 }
