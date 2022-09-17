@@ -11,6 +11,7 @@ namespace grid_clock
     {
         public int hour, minute;
         public string description;
+        public bool on = false;
 
         // TODO: 读取notes中的闹钟
         public static List<Alarm>[] AlarmList = new List<Alarm>[24];
@@ -32,13 +33,14 @@ namespace grid_clock
             foreach (string line in lines)
             {
                 Alarm alarm = new Alarm();
-                Regex filter = new Regex(@"^([0-5]?[0-9])=(.*)$"); // 匹配 <分钟>=<内容> 的格式
+                Regex filter = new Regex(@"^([0-5]?[0-9])(-|=)(.*)$"); // 匹配 <分钟>=<内容> 或 <分钟>-<内容> 的格式
                 if (filter.IsMatch(line))
                 {
                     Match match = filter.Match(line);
                     alarm.hour = h;
                     alarm.minute = Convert.ToInt32(match.Groups[1].Value);
-                    alarm.description = match.Groups[2].Value;
+                    alarm.on = match.Groups[2].Value == "=" ? true : false;
+                    alarm.description = match.Groups[3].Value;
                     AlarmList[h].Add(alarm);
                 }
             }

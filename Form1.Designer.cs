@@ -33,13 +33,14 @@
             this.noteTextBox = new System.Windows.Forms.TextBox();
             this.timeLabel = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.timerGC = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // timer1
             // 
             this.timer1.Enabled = true;
-            this.timer1.Interval = 10;
+            this.timer1.Interval = 200;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // noteTextBox
@@ -73,6 +74,12 @@
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
             // 
+            // timerGC
+            // 
+            this.timerGC.Enabled = true;
+            this.timerGC.Interval = 5000;
+            this.timerGC.Tick += new System.EventHandler(this.timerGC_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -100,6 +107,7 @@
         private System.Windows.Forms.TextBox noteTextBox;
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Timer timerGC;
     }
 }
 

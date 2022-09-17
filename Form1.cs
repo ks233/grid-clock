@@ -130,7 +130,7 @@ namespace grid_clock
             // noteTextBox.Size = new Size(this.Width - noteTextBox.Left - gBtnOffsetX * 2, this.Height - 200);
             SelectIndex(DateTime.Now.Hour);
             ApplyTheme();
-
+            GC.Collect();
         }
 
         private void UpdateButtonText()
@@ -263,6 +263,7 @@ namespace grid_clock
 
         private void timeLabel_Click(object sender, EventArgs e)
         {
+            ShwoAlarmMessage(new Alarm());
         }
 
         private void Form1_DoubleClick(object sender, EventArgs e)
@@ -310,6 +311,12 @@ namespace grid_clock
             DrawProgImg(h, progress, ThemeColor(h));
         }
 
+        private void timerGC_Tick(object sender, EventArgs e)
+        {
+
+            GC.Collect();
+        }
+
         private void MixButtonImage(int h)
         {
             Bitmap mixed = new Bitmap(buttonWidth,buttonHeight);
@@ -329,6 +336,13 @@ namespace grid_clock
                 Alarm.UpdateAlarmList(notes, selected);
                 DrawAlarmImg(selected);
             }
+        }
+        private void ShwoAlarmMessage(Alarm alarm)
+        {
+            string s = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
+            System.Media.SoundPlayer player = new System.Media.SoundPlayer(@"alarm.wav");
+            player.Play();
+            MessageBox.Show($"{alarm.description}","闹钟");
         }
     }
 }
