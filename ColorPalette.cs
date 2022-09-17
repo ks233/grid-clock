@@ -49,5 +49,8 @@ namespace grid_clock
         public static Color afternoon = Color.FromArgb(91, 232, 245);
         public static Color evening =  Color.FromArgb(255, 178, 101);
         public static Color night = Color.FromArgb(186, 122, 255);
+
+
+        public static Color AlarmLine = Color.Red;
     }                 
 }

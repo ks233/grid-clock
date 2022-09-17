@@ -45,7 +45,7 @@ namespace grid_clock
         private int selected = 0;
 
 
-        
+
 
         public Form1()
         {
@@ -54,14 +54,14 @@ namespace grid_clock
 
 
 
-        private void NewButton(int i,int x,int y,int height,int width)
+        private void NewButton(int i, int x, int y, int height, int width)
         {
             this.Controls.Add(hourButtons[i]);
             hourButtons[i].Text = i.ToString();
 
             hourButtons[i].Font = new Font(new FontFamily("Comic Sans MS"), 16);
 
-            hourButtons[i].Location = new Point(x + gBtnOffsetX, y +gBtnOffsetY);
+            hourButtons[i].Location = new Point(x + gBtnOffsetX, y + gBtnOffsetY);
             hourButtons[i].Size = new Size(height, width);
             hourButtons[i].FlatStyle = FlatStyle.Flat;
             hourButtons[i].FlatAppearance.BorderSize = 1;
@@ -72,21 +72,21 @@ namespace grid_clock
 
         }
 
-        
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
             ColorPalette.dark = false;
             dateTest = new DateTime();
             dateTest = dateTest.AddHours(10);
-
+            h = DateTime.Now.Hour;
             Alarm.Initialize();
 
             // 实例化24个按钮
             for (int i = 0; i < 24; i++)
             {
                 hourButtons[i] = new Button();
-                progImages[i] = new Bitmap(buttonWidth,buttonHeight);
+                progImages[i] = new Bitmap(buttonWidth, buttonHeight);
                 alarmImages[i] = new Bitmap(buttonWidth, buttonHeight);
                 notes[i] = "";
             }
@@ -96,7 +96,7 @@ namespace grid_clock
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    NewButton((i * 4 + j + 23)%24,  j * buttonWidth, i * buttonHeight , buttonWidth , buttonHeight);
+                    NewButton((i * 4 + j + 23) % 24, j * buttonWidth, i * buttonHeight, buttonWidth, buttonHeight);
                 }
             }
             // 上午7~12
@@ -105,7 +105,7 @@ namespace grid_clock
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    NewButton(i * 3 + j + 7, j * buttonWidth , i * buttonHeight + yOffset, buttonWidth, buttonHeight);
+                    NewButton(i * 3 + j + 7, j * buttonWidth, i * buttonHeight + yOffset, buttonWidth, buttonHeight);
                 }
             }
             // 下午13~18
@@ -118,7 +118,7 @@ namespace grid_clock
                 }
             }
 
-            yOffset  += 2*buttonHeight+ 20; 
+            yOffset += 2 * buttonHeight + 20;
             // 晚上19~22
             for (int j = 0; j < 4; j++)
             {
@@ -129,14 +129,14 @@ namespace grid_clock
 
             // noteTextBox.Location = new Point(gBtnOffsetX * 2 + 4 * buttonWidth, gBtnOffsetY);
             // noteTextBox.Size = new Size(this.Width - noteTextBox.Left - gBtnOffsetX * 2, this.Height - 200);
-            SelectIndex(DateTime.Now.Hour);
+            SelectIndex(h);
             ApplyTheme();
             GC.Collect();
         }
 
         private void UpdateButtonText()
         {
-            for(int i = 0;i < 24; i++)
+            for (int i = 0; i < 24; i++)
             {
                 if (selected == i)
                 {
@@ -149,7 +149,7 @@ namespace grid_clock
                 {
                     hourButtons[i].Text += "*";
                 }
-                
+
             }
         }
 
@@ -174,7 +174,7 @@ namespace grid_clock
         }
 
         // 把按钮做出进度条的效果
-        private void DrawProgImg(int hour,float progress, Color color)
+        private void DrawProgImg(int hour, float progress, Color color)
         {
             // 生成固定大小的纯色图像
             Bitmap bg = new Bitmap(buttonWidth, buttonHeight);
@@ -192,14 +192,27 @@ namespace grid_clock
         {
             Bitmap bg = new Bitmap(buttonWidth, buttonHeight);
             using (Graphics gfx = Graphics.FromImage(bg))
-            using (Pen pen = new Pen(Color.Red,2))
-            {
-                foreach(Alarm a in Alarm.AlarmList[hour])
+                foreach (Alarm a in Alarm.AlarmList[hour])
                 {
+                    int penSize = 2;
+
                     int v = buttonWidth * a.minute / 60;
-                    gfx.DrawLine(pen, v, 0, v, buttonHeight);
+                    using (Pen pen = new Pen(ColorPalette.AlarmLine, penSize))
+                    {
+                        if (a.on)// 如果是闹钟就画实线
+                        {
+                            gfx.DrawLine(pen, v, 0, v, buttonHeight);
+                        }
+                        else
+                        {
+                            // 如果不是闹钟只是提醒就画虚线
+                            for (int i = 0; i < buttonHeight; i += 8)
+                            {
+                                gfx.DrawLine(pen, v, i, v, i + 5);
+                            }
+                        }
+                    }
                 }
-            }
             alarmImages[hour] = bg;
             MixButtonImage(hour);
         }
@@ -244,7 +257,7 @@ namespace grid_clock
         private Color ThemeColor(int i)
         {
             // return Color.FromArgb(255, 144, 88);
-            if(i == 23 || (i >= 0 && i <= 6)) 
+            if (i == 23 || (i >= 0 && i <= 6))
             {
                 return ColorPalette.night;
             }
@@ -252,7 +265,7 @@ namespace grid_clock
             {
                 return ColorPalette.morning;
             }
-            else if (i >=13 && i <= 18)
+            else if (i >= 13 && i <= 18)
             {
                 return ColorPalette.afternoon;
             }
@@ -264,7 +277,19 @@ namespace grid_clock
 
         private void timeLabel_Click(object sender, EventArgs e)
         {
-            ShowAlarmMessage(new Alarm());
+            /*
+            //颜色测试
+            h = h==23?22:23;
+            m = 59;
+            s = 59;
+            for(int i = 0;i<24;i++)
+            {
+                notes[i] = "20=aaa\r\n40-bbb";
+                Alarm.UpdateAlarmList(notes, i);
+                DrawAlarmImg(i);
+            }
+            FillBtnColor(h);
+            */
         }
 
         private void Form1_DoubleClick(object sender, EventArgs e)
@@ -281,20 +306,23 @@ namespace grid_clock
             foreach (Button b in hourButtons)
             {
                 b.BackColor = ColorPalette.ButtonColor;
-                FillBtnColor(DateTime.Now.Hour);
+                FillBtnColor(h);
             }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            DateTime dateTime = DateTime.Now; 
 
-            // dateTest = dateTest.AddMinutes(1);
-            // DateTime dateTime = dateTest; 
+            // ==========测试用==========
+            /*
+            dateTest = dateTest.AddMinutes(10);
+            DateTime dateTime = dateTest;*/
+            // ==========测试用==========
 
+            // 更新时间
+
+            DateTime dateTime = DateTime.Now;
             this.Text = dateTime.ToString();
-
-
             h = dateTime.Hour;
             if (m != dateTime.Minute)
             {
@@ -302,9 +330,11 @@ namespace grid_clock
                 RingAlarm();
             }
             s = dateTime.Second;
+            
+            
 
             float progress = (m * 60 + s) / 3600.0f;
-            
+
             // 如果h和缓存的lastUpdatedHour不一致，就要更新前面的按钮样式
             if (h != lastUpdatedHour)
             {
@@ -324,7 +354,7 @@ namespace grid_clock
 
         private void MixButtonImage(int h)
         {
-            Bitmap mixed = new Bitmap(buttonWidth,buttonHeight);
+            Bitmap mixed = new Bitmap(buttonWidth, buttonHeight);
             using (Graphics g = Graphics.FromImage(mixed))
             {
                 g.DrawImage(progImages[h], 0, 0);
@@ -338,7 +368,10 @@ namespace grid_clock
             Alarm alarm = Alarm.GetAlarm(h, m);
             if (alarm != null)
             {
-                ShowAlarmMessage(alarm);
+                if (alarm.on)
+                {
+                    ShowAlarmMessage(alarm);
+                }
             }
         }
 
@@ -354,7 +387,7 @@ namespace grid_clock
         private void ShowAlarmMessage(Alarm alarm)
         {
             // 窗口前置
-            if (this.WindowState==FormWindowState.Minimized)this.WindowState = FormWindowState.Normal; 
+            if (this.WindowState == FormWindowState.Minimized) this.WindowState = FormWindowState.Normal;
             this.Activate();
 
             // 播放声音
